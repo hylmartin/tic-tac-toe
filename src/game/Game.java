@@ -15,9 +15,9 @@ import game.player.Move;
  * @author Martin Hyl
  */
 public class Game {
-    private Board board;
-    private IMove player1;
-    private IMove player2;           ;
+    protected Board board;
+    protected IMove player1;
+    protected IMove player2;           ;
 
     public Game(int boardSize, IMove player1, IMove player2) {
         board = new Board(boardSize);
@@ -27,26 +27,66 @@ public class Game {
     
     public void playGame()
     {
-        Move move;
         for(;;){
-            move = player1.makeMove(board, BoardSymbol.CIRCLE);
-            board.setSymbolAccordingToMove(move);
             System.out.println(board);
-            if(isWinner(board, move, player1)){
-                System.out.println(player1.getName() + "WIN");
+            if(makeMove(player1, BoardSymbol.CIRCLE)){
                 return;
             }
-            move = player2.makeMove(board, BoardSymbol.CROSS);
-            board.setSymbolAccordingToMove(move);
             System.out.println(board);
-            if(isWinner(board, move, player2)){
-                System.out.println(player2.getName() + "WIN");
+            if(makeMove(player2, BoardSymbol.CROSS)){
                 return;
             }
             
         }
     }
-
+    
+    protected boolean makeMove(IMove player, BoardSymbol symbol){
+        Move move = player.makeMove(board, symbol);
+        board.setSymbolAccordingToMove(move);
+        if(isWinner(board,move,player)){
+            return true;
+        }
+        return false;
+    }
+    
+    
+    private final int moves[][] = {{1,1}, {0,1}, {-1,1}, {-1,0}};
+    protected boolean isWinner(Board board, Move move, IMove player)
+    {
+        for (int j = 0; j < 4; j++ ) {
+            int symbolsInRow = 1;
+            for(int i = 1; i < 5; i++){
+                if(!isSame(board, move.getSymbol(), move.getPosX() + i * moves[j][0], move.getPosY() + i * moves[j][1])){
+                    break;
+                }
+                symbolsInRow++;
+            }
+            for(int i = -1; i > -5; i--){
+                if(!isSame(board, move.getSymbol(), move.getPosX() + i * moves[j][0], move.getPosY() + i * moves[j][1])){
+                    break;
+                }
+                symbolsInRow++;
+            }
+            if(symbolsInRow == 5){
+                System.out.println("Winner: " + player.getName());
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    
+    
+    private boolean isSame(Board board, BoardSymbol symbol, int x, int y)
+    {
+        if(x < 0 || y < 0 || x >= board.getBoardSize() || y >= board.getBoardSize() )
+            return false;
+        if (board.getSymbolAtPosition( x, y) == symbol)
+            return true;
+        return false;
+    }
+    /*
     private boolean isWinner(Board board, Move move, IMove player) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         int n = 0;
@@ -118,5 +158,5 @@ public class Game {
         }
         return w+e >= 4 || s+n >= 4 || sw+ne >=4 || nw+se >=4;
     }
-    
+    */
 }

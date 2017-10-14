@@ -5,6 +5,16 @@
  */
 package gui;
 
+import game.GUIGame;
+import game.board.Board;
+import game.board.BoardSymbol;
+import game.player.Move;
+import game.player.StupidPlayer;
+import java.awt.Color;
+import java.awt.Graphics;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.JSpinner.DefaultEditor;
+
 /**
  *
  * @author Martin Hyl
@@ -14,10 +24,64 @@ public class Window extends javax.swing.JFrame {
     /**
      * Creates new form Window
      */
+    private final int topXShift = 30;
+    private final int topYShift = 50;
+    private final int bottomXShift = 150;
+    private final int bottomYShift = 50;
+    private int boardSize;
+    private boolean running;
+    
     public Window() {
         initComponents();
     }
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if(game != null){
+            paintBackground(g);
+            paintSymbols(g);
+        }
+    }
+    
+    private void paintBackground(Graphics g){
+        
+        int sizeX = this.getWidth() - topXShift - bottomXShift;
+        int sizeY = this.getHeight() - topYShift - bottomYShift;
+        for(int i = 0; i <= boardSize; i++){
+            int linexPosition = (int)(((double)sizeX/boardSize)*i) + topXShift;
+            g.drawLine(linexPosition, topYShift, linexPosition, topYShift + sizeY);
+            int lineyPosition = (int)(((double)sizeY/boardSize)*i) + topYShift;
+            g.drawLine(topXShift, lineyPosition, topXShift + sizeX, lineyPosition);
+        }
+        
+    }
+
+    private void paintSymbols(Graphics g){
+        Board board = game.getBoard();
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if(board.getSymbolAtPosition(i, j) == BoardSymbol.CIRCLE){
+                    int sizeOfCircleX = (int)((double)(this.getWidth() - topXShift - bottomXShift)/boardSize);
+                    int sizeOfCircleY = (int)((double)(this.getHeight() - topYShift - bottomYShift)/boardSize);
+                    int positionX = (int)(((double)(this.getWidth() - topXShift - bottomXShift)/boardSize) * i) + topXShift;
+                    int positionY = (int)(((double)(this.getHeight() - topYShift - bottomYShift)/boardSize) * j) + topYShift;
+                    g.setColor(Color.red);
+                    g.drawOval(positionX,positionY, sizeOfCircleX, sizeOfCircleY);
+                }
+                else if (board.getSymbolAtPosition(i, j) == BoardSymbol.CROSS){
+                    int positionXfrom = (int)(((double)(this.getWidth() - topXShift - bottomXShift)/boardSize) * i) + topXShift;
+                    int positionYfrom = (int)(((double)(this.getHeight() - topYShift - bottomYShift)/boardSize) * j) + topYShift;
+                    int positionXto = (int)(((double)(this.getWidth() - topXShift - bottomXShift)/boardSize) * (i+1)) + topXShift;
+                    int positionYto = (int)(((double)(this.getHeight() - topYShift - bottomYShift)/boardSize) * (j+1)) + topYShift;
+                    g.setColor(Color.blue);
+                    g.drawLine(positionXfrom, positionYfrom, positionXto, positionYto);
+                    g.drawLine(positionXto, positionYfrom, positionXfrom, positionYto);
+                }
+            }
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,21 +91,149 @@ public class Window extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jSpinner1 = new javax.swing.JSpinner();
+        jLabel2 = new javax.swing.JLabel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                formMouseReleased(evt);
+            }
+        });
+
+        jButton1.setText("Start game");
+        jButton1.setActionCommand("jStartButton");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Board size");
+
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(10, 10, 30, 1));
+        jSpinner1.setEditor(new javax.swing.JSpinner.NumberEditor(jSpinner1, ""));
+        jSpinner1.setRequestFocusEnabled(false);
+        jSpinner1.setValue(10);
+
+        jLabel2.setText("First symbol");
+
+        jRadioButton1.setSelected(true);
+        jRadioButton1.setText("Human");
+        jRadioButton1.setActionCommand("jRadioButtonHuman");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+
+        jRadioButton3.setText("Stupid player");
+        jRadioButton3.setActionCommand("jRadioButtonStupidPlayer");
+        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 610, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(1039, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jRadioButton3)
+                    .addComponent(jRadioButton1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 449, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton3)
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 424, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(58, 58, 58))
         );
+
+        ((DefaultEditor) jSpinner1.getEditor()).getTextField().setEditable(false);
+        jSpinner1.getAccessibleContext().setAccessibleName("");
+        jSpinner1.getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private GUIGame game;
+    
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        
+        boardSize = (int)jSpinner1.getValue();
+        game = new GUIGame(boardSize,new StupidPlayer());
+        running = true;
+        if(jRadioButton3.isSelected())
+            game.makeMove(BoardSymbol.CROSS);
+        repaint();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
+        if(game != null && running){
+            int positionXOnBoard = (evt.getX() - topXShift)/((this.getWidth() - topXShift - bottomXShift)/boardSize);
+            int positionYOnBoard = (evt.getY() - topYShift)/((this.getHeight()- topYShift - bottomYShift)/boardSize);
+            
+            if(positionXOnBoard < 0 || positionXOnBoard >= boardSize || positionXOnBoard < 0 || positionXOnBoard >= boardSize)
+            {
+                return;
+            }
+            if(game.getBoard().isAlreadySymbol(positionXOnBoard, positionYOnBoard))
+            {
+                System.err.println("Already symbol");
+                return;
+            }
+            
+            if(game.makeMove(new Move(positionXOnBoard,positionYOnBoard,BoardSymbol.CIRCLE))){
+                repaint();
+                running = false;
+                showMessageDialog(null, "The winner is.... HUMAN");
+                return;
+            }
+            if(game.makeMove(BoardSymbol.CROSS)){
+                repaint();
+                running = false;
+                showMessageDialog(null, "The winner is.... STUPID PLAYER");
+                return;
+            }
+            repaint();
+            
+        }
+    }//GEN-LAST:event_formMouseReleased
+
+    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+        jRadioButton3.setSelected(true);
+        jRadioButton1.setSelected(false);
+    }//GEN-LAST:event_jRadioButton3ActionPerformed
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        jRadioButton3.setSelected(false);
+        jRadioButton1.setSelected(true);
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -79,5 +271,11 @@ public class Window extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JSpinner jSpinner1;
     // End of variables declaration//GEN-END:variables
 }

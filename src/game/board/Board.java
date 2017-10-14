@@ -29,6 +29,12 @@ public class Board {
         return board[x][y];
     }
     
+    public boolean isAlreadySymbol(int x, int y){
+        if(board[x][y] == null)
+            return false;
+        return true;
+    }
+    
     public void setSymbolAccordingToMove(Move move){
         if(board[move.getPosX()][move.getPosY()] == null) {
             board[move.getPosX()][move.getPosY()] = move.getSymbol();
